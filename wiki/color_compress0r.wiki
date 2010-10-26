@@ -3,7 +3,7 @@
 
 = Introduction =
 
-A frei0r video effect plugin for compressing RGBA or HSVA colorspacewith optional histogram and transfer curve overlay display based on Cairo (scaleable/antialiased).
+A frei0r video effect plugin for compressing RGBA or HSVA colorspace with optional histogram and transfer curve overlay display based on Cairo (scaleable/antialiased).
 
 
 = Details =
