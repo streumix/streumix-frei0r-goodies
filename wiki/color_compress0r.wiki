@@ -1,9 +1,9 @@
-#summary One-sentence summary of this page.
+#summary A frei0r video effect plugin for compressing RGBA or HSVA colorspace.
 #labels Featured
 
 = Introduction =
 
-A frei0r video effect plugin for compressing RGBA or HSVA colorspace.
+A frei0r video effect plugin for compressing RGBA or HSVA colorspacewith optional histogram and transfer curve overlay display based on Cairo (scaleable/antialiased).
 
 
 = Details =
