@@ -1,0 +1,32 @@
+<!DOCTYPE kpartgui>
+<effect tag="frei0r.selective_c0nv" id="frei0r.selective_c0nv">
+	<name>Selective C0nv</name>
+	<description>Selective blur via a dynamically adjusted (color distance) convolution kernel</description>
+	<author>Toby Mangold</author>
+	<parameter type="constant" name="threshold" default="500" min="0" max="1000" factor="1000">
+		<name>Mapping 50% threshold</name>
+	</parameter>
+	<parameter type="constant" name="slope" default="450" min="0" max="900" factor="900">
+		<name>Mapping 50% slope</name>
+	</parameter>
+	<parameter type="color" name="color" default="0xFFFFFF">
+		<name>Reference Color</name>
+	</parameter>
+	<parameter type="bool" name="inverse" default="0">
+		<name>Invert Mapping</name>
+	</parameter>
+	<parameter type="constant" name="radius" default="5" min="0" max="10" factor="10">
+		<name>Blur Radius</name>
+	<parameter type="bool" name="map" default="0">
+		<name>Overlay histogram / mapping curve</name>
+	</parameter>
+	<parameter type="constant" name="hsize" default="50" min="0" max="100" factor="100">
+		<name>Graph size</name>
+	</parameter>
+	<parameter type="constant" name="hposition_x" default="50" min="0" max="100" factor="100">
+		<name>Graph position x</name>
+	</parameter>
+	<parameter type="constant" name="hposition_y" default="95" min="0" max="100" factor="100">
+		<name>Graph position y</name>
+	</parameter>
+</effect>
