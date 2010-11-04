@@ -9,9 +9,10 @@
     <Content type="html">
         <![CDATA[
 <span id="content"></span>
-
-<script src="http://mathml-gadget.googlecode.com/svn/trunk/ASCIIMathML.js" type="text/javascript"></script>
+<script src="http://www.chapman.edu/~jipsen/mathml/ASCIIMathMLeditor.js" type="text/javascript"></script>
 <script type="text/javascript">
+
+//http://mathml-gadget.googlecode.com/svn/trunk/ASCIIMathML.js
 mathcolor = "__UP_foreground__";
 mathfontsize = "__UP_fontsize__";
 
