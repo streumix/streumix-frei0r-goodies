@@ -18,9 +18,9 @@ mathfontsize = "__UP_fontsize__";
 
 
 formula = "__UP_content__";
-formula = formula.replace("&lt;", "<");
-formula = formula.replace("&gt;", ">");
-formula = formula.replace("&amp;", "&");
+// formula = formula.replace("&lt;", "<");
+// formula = formula.replace("&gt;", ">");
+// formula = formula.replace("&amp;", "&");
 // formula = formula.replace("&apos;", "'");
 // formula = formula.replace("&quot;", "\"");
 
