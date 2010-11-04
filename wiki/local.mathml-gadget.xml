@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Module>
+    <ModulePrefs title="MathML Gadget">
+        <Require feature="dynamic-height"/>
+    </ModulePrefs>
+    <UserPref name="content" datatype="string" display_name="Content" required="true"/>
+    <UserPref name="foreground" datatype="string" display_name="Formula Color" required="false" default_value=""/>
+    <UserPref name="fontsize" datatype="string" display_name="Formula Font Size" required="false" default_value="1em"/>
+    <Content type="html">
+        <![CDATA[
+<span id="content"></span>
+
+<script src="http://mathml-gadget.googlecode.com/svn/trunk/ASCIIMathML.js" type="text/javascript"></script>
+<script type="text/javascript">
+mathcolor = "__UP_foreground__";
+mathfontsize = "__UP_fontsize__";
+
+formula = "__UP_content__";
+formula = formula.replace("&lt;", "<");
+formula = formula.replace("&gt;", ">");
+formula = formula.replace("&apos;", "'");
+formula = formula.replace("&quot;", "\"");
+formula = formula.replace("&amp;", "&");
+
+document.getElementById('content').appendChild(AMparseMath(formula));
+gadgets.window.adjustHeight();
+</script>
+        ]]>
+    </Content>
+</Module>
+
