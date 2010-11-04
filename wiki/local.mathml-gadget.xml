@@ -20,11 +20,10 @@ mathfontsize = "__UP_fontsize__";
 
 formula = "__UP_content__";
 formula = formula.replace(/&lt;/g, "<");
-formula = formula.replace(/&gt;/g, ">");
+formula = formula.replace(/[&]+gt;/m, ">");
 formula = formula.replace(/&amp;/g, "&");
 formula = formula.replace(/&apos;/g, "'");
 formula = formula.replace(/&quot;/g, "\"");
-alert(formula);
 
 document.getElementById('content').appendChild(AMparseMath(formula));
 gadgets.window.adjustHeight();
