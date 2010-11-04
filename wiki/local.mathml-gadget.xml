@@ -9,20 +9,21 @@
     <Content type="html">
         <![CDATA[
 <span id="content"></span>
-<script src="http://www.chapman.edu/~jipsen/mathml/ASCIIMathML.js" type="text/javascript"></script>
+<script src="http://mathml-gadget.googlecode.com/svn/trunk/ASCIIMathML.js" type="text/javascript"></script>
 <script type="text/javascript">
 
-//http://mathml-gadget.googlecode.com/svn/trunk/ASCIIMathML.js
+//http://www.chapman.edu/~jipsen/mathml/ASCIIMathML.js
+//
 mathcolor = "__UP_foreground__";
 mathfontsize = "__UP_fontsize__";
 
 
 formula = "__UP_content__";
-// formula = formula.replace("&lt;", "<");
-// formula = formula.replace("&gt;", ">");
-// formula = formula.replace("&amp;", "&");
-// formula = formula.replace("&apos;", "'");
-// formula = formula.replace("&quot;", "\"");
+formula = formula.replace(/&lt;/g, "<");
+formula = formula.replace(/&gt;/g, ">");
+formula = formula.replace(/&amp;/g, "&");
+formula = formula.replace(/&apos;/g, "'");
+formula = formula.replace(/&quot;/g, "\"");
 
 document.getElementById('content').appendChild(AMparseMath(formula));
 gadgets.window.adjustHeight();
