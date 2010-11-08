@@ -1,13 +1,19 @@
-#include "common.h"
 #include <cairo.h>
 #include <arpa/inet.h>
+
+#include "frei0r_common.hpp"
 
 #define HIST_DATA_N 4
 
 typedef struct {
-    f0r_param_boolcxx active;
-    f0r_param_color c;
+    unsigned int min;
     unsigned int max;
+} urange;
+
+typedef struct {
+    bool active;
+    struct {double b,g,r,a; } c;
+    urange range;
     unsigned int v[256];
 } hist_data_channel;
 
@@ -23,31 +29,24 @@ typedef struct {
     double alpha_shadow;
 } hist_plot_config;
 
-class hist_plot
-{
-    unsigned int gmax;
+class hist_plot {
+    urange gminmax;
     cairo_surface_t *surface;
     cairo_t *cr;
-    unsigned int set_max_hdata(hist_data_channel *c){
-        unsigned int i;
-        c->max=0;
-        for (i=0; i<256;i++) if (c->v[i] > c->max) c->max = c->v[i];
-        return c->max;
-    }
+    unsigned int hist_data_n;
 
-
-    int draw_hdata(unsigned int *h,unsigned int m,double r,double g,double b,double a){
+    int draw_hdata(unsigned int *h,urange mm,double r,double g,double b,double a){
         int i;
-        double s=100.0/log2((double) m);
+        double s=100.0/(log2((double) (mm.max-mm.min+1) ));
         double x;
         cairo_path_t * t;
 
         if(!cr) return 0;
         cairo_set_source_rgba(cr, r, g,b,a);
-        x= h[0] >= 1 ? log2((double)h[0]) : 0;
+        x= h[0] > mm.min ? log2((double) (h[0]-mm.min+1) ) : 0;
         cairo_move_to (cr, 0, (100.0-s*x));
         for (i=1; i<256;i++){
-            x= h[i] >= 1 ?  log2((double)h[i]) : 0;
+            x= h[i] > mm.min ?  log2((double)(h[i]-mm.min+1)) : 0;
             cairo_line_to (cr, i, (100.0-s*x));
         }
         t=cairo_copy_path(cr);
@@ -76,31 +75,28 @@ public:
     f0r_param_double rhx;
     f0r_param_double rhy;
     hist_plot_config hconf;
-    hist_data_channel hdata[HIST_DATA_N];
-
-    hist_plot(int wdt, int hgt){
-        hist_plot();
-    }
+    hist_data_channel *hdata;
 
     hist_plot(){
-        int i;
+        hist_plot(HIST_DATA_N);
+    }
+
+    hist_plot(int data_channels){
+        unsigned int i;
         block_histplot=false;
         cr=NULL;
         surface=NULL;
+        hist_data_n=data_channels;
         // init of max data
-        gmax=0;
+        gminmax= { 2*hist_screen.size,0};
 
-        for(i=0;i<HIST_DATA_N;i++){
-            hdata[i].max=0;
+        hdata = new hist_data_channel[hist_data_n];
+
+        for(i=0;i<hist_data_n;i++){
+            hdata[i].range=gminmax;
             hdata[i].active=true;
+            hdata[i].c={1,1,1};
         }
-        // no alpha mapping
-        hdata[3].active=false;
-        // color defaults are set to RGBA
-        hdata[0].c={0,0,1};
-        hdata[1].c={0,1,0};
-        hdata[2].c={1,0,0};
-        hdata[3].c={0.5,0.5,0.5};
         // relative size
         rhsize=0.5;
         // position on screen
@@ -131,6 +127,7 @@ public:
         // DEBUG
         if (cr) cairo_destroy (cr);
         if (surface) cairo_surface_destroy (surface);
+        delete hdata;
     }
 
     void hist_init(ScreenGeometry sg){
@@ -204,9 +201,9 @@ public:
         // drawing of hdata
         if(!block_histplot){
             cairo_set_line_width (cr,dy);
-            for(i=0;i<HIST_DATA_N;i++){
+            for(i=0;i<hist_data_n;i++){
                 if (hdata[i].active){
-                    draw_hdata(hdata[i].v,gmax,
+                    draw_hdata(hdata[i].v,gminmax,
                         hdata[i].c.r,hdata[i].c.g,hdata[i].c.b,hconf.alpha_hist);
                 }
             }
@@ -236,35 +233,42 @@ public:
         return 1;
     }
 
-    unsigned int hist_set_max(int n){
-        hdata[n].max=0;
-        return hist_get_max(n);
+    urange hist_set_range(int n){
+        hdata[n].range={2*hist_screen.size,0};
+        return hist_get_range(n);
     }
 
-    unsigned int hist_set_max(){
-        int i;
-        for(i=0;i<HIST_DATA_N;i++){
-            hdata[i].max=0;
-        }
-        gmax=0;
-        return hist_get_max();
-    }
-
-    unsigned int hist_get_max(int n){
+    urange hist_set_range(){
         unsigned int i;
-        if ( hdata[n].max == 0) {
-            for (i=0; i<256;i++) if (hdata[n].v[i] > hdata[n].max) hdata[n].max = hdata[n].v[i];
+        gminmax= {2*hist_screen.size,0};
+        for(i=0;i<hist_data_n;i++){
+            hdata[i].range=gminmax;
         }
-        return hdata[n].max;
+        return hist_get_range();
     }
 
-    unsigned int hist_get_max(){
-        int i;
-        if (!gmax) {
-            gmax=1;
-            for (i=0; i<HIST_DATA_N;i++) if (hdata[i].active) gmax=std::max(gmax,hist_get_max(i));
+    urange hist_get_range(int n){
+        unsigned int i;
+        if ( hdata[n].range.max == 0) {
+            for (i=0; i<256;i++){
+                 if (hdata[n].v[i] < hdata[n].range.min) hdata[n].range.min = hdata[n].v[i];
+                 if (hdata[n].v[i] > hdata[n].range.max) hdata[n].range.max = hdata[n].v[i];
+            }
         }
-        return gmax;
+        return hdata[n].range;
+    }
+
+    urange hist_get_range(){
+        unsigned int i;
+        urange r;
+        if (!gminmax.max) {
+            for (i=0; i<hist_data_n;i++){
+                r=hist_get_range(i);
+                if (hdata[i].active) gminmax.min=std::min(gminmax.min,r.min);
+                if (hdata[i].active) gminmax.max=std::max(gminmax.max,r.max);
+            }
+        }
+        return gminmax;
     }
 };
 
