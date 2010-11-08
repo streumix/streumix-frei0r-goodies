@@ -3,26 +3,15 @@
 
 = Introduction =
 
-Due to the non-linear nature of the RGB to HSV (HSI) color space conversion, it's a well known fact that \
-most conversion routines are utilizing floating-point arithmetic and store HSV values in floating point \ 
-numbers, respectively. Furthermore, it's impossible to store full color infomation of RGB color space with\  
-a given numeric precicion in HSV space with identical precision. The non-linear transformation requires higher \
-precision in HSV space to get a lossless, neutral RGB->HSV->RGB conversion chain.
+Due to the non-linear nature of the RGB to HSV (HSI) color space conversion, it's a well known fact that most conversion routines are utilizing floating-point arithmetic and store HSV values in floating point numbers, respectively. Furthermore, it's impossible to store full color infomation of RGB color space with a given numeric precicion in HSV space with identical precision. The non-linear transformation requires higher precision in HSV space to get a lossless, neutral RGB->HSV->RGB conversion chain.
 
-For this reason, a purely integer based implementation was developed, which allows to add a variable \
-number of bits on the HSV side compared to the 3x8-bit resolution of the RGB component values.
+For this reason, a purely integer based implementation was developed, which allows to add a variable number of bits on the HSV side compared to the 3x8-bit resolution of the RGB component values.
 
 = Details =
 
-The developed conversion routines, which are part of the color_compress0r _frei0r_ effect plugin, \ 
-utilize a quadruple of 4x8-bit integer (struct of 4 times uint8) to store RGBA pixel information, and \
-a quadruple of 4x16-bit integer (struct if 4 time uint16) to store HSVA values. The conversion itself \
-relies on 32-bit integer arithmetic. Effective numeric precision for HSV values can be adjusted at complie time. 
+The developed conversion routines, which are part of the color_compress0r _frei0r_ effect plugin, utilize a quadruple of 4x8-bit integer (struct of 4 times uint8) to store RGBA pixel information, and a quadruple of 4x16-bit integer (struct if 4 time uint16) to store HSVA values. The conversion itself relies on 32-bit integer arithmetic. Effective numeric precision for HSV values can be adjusted at complie time. 
 
-Sweeping the HSV numeric precision showed that 4 additional bits are sufficient to store 8-bit RGB \
-colorspace information withoput any loss. Going RGB(8-bit)->HSV(12-bit)->RGB(8-bit) builds a neutral \
-transformation. The following table lists the remaining bit error versus  HSV precision and clearly
-shows that 8-bit HSV precision is way too low.
+Sweeping the HSV numeric precision showed that 4 additional bits are sufficient to store 8-bit RGB colorspace information withoput any loss. Going RGB(8-bit)->HSV(12-bit)->RGB(8-bit) builds a neutral transformation. The following table lists the remaining bit error versus  HSV precision and clearly shows that 8-bit HSV precision is way too low.
 
 || *HSV resolution* || *0-bit error* || *1-bit error* || *2-bit error* || *>=3-bit error*|| *max. error = sum() ||
 || 12-bit || 100% || || || || 0 || 
