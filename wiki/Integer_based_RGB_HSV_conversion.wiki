@@ -40,7 +40,7 @@ typedef struct col64bit_s {
     uint16_t a;
 } col64bit;
 
-col64bit rgba2hsva(const col32bit c){
+inline col64bit rgba2hsva(const col32bit c){
   col64bit r;
   uint32_t iMin,iMax,chroma;
   const uint32_t k1=255 << ABITS;
@@ -82,7 +82,7 @@ col64bit rgba2hsva(const col32bit c){
   return r;
 }
 
-col32bit hsva2rgba(const col64bit c){
+inline col32bit hsva2rgba(const col64bit c){
   col32bit r;
   uint32_t m;
   int H,X,ih,is,iv;
