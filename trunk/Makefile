@@ -12,7 +12,7 @@ LDFLAGS = -lfrei0r_common $(shell pkg-config --libs cairo) -Wl,-shared
 all: $(PLUGINS)
 
 frei0r_common.a: %.a : %.o
-	ar rc $@ $<
+	ar rc lib$@ $<
 
 $(PLUGINS) : % : %.cpp
 	$(CC) $(CXXFLAGS) -c -o $@.so $< $(LDFLAGS)
