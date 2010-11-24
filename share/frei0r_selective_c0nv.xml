@@ -4,10 +4,13 @@
 	<description>Selective blur via a dynamically adjusted (color distance) convolution kernel</description>
 	<author>Toby Mangold</author>
 	<parameter type="constant" name="threshold" default="500" min="0" max="1000" factor="1000">
-		<name>Mapping 50% threshold</name>
+		<name>threshold x</name>
+	</parameter>
+	<parameter type="constant" name="threshold" default="500" min="0" max="1000" factor="1000">
+		<name>threshold y</name>
 	</parameter>
 	<parameter type="constant" name="slope" default="450" min="0" max="900" factor="900">
-		<name>Mapping 50% slope</name>
+		<name>threshold slope</name>
 	</parameter>
 	<parameter type="color" name="color" default="0xFFFFFF">
 		<name>Reference Color</name>

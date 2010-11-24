@@ -12,7 +12,7 @@ typedef struct {
 
 typedef struct {
     bool active;
-    struct {double b,g,r,a; } c;
+    struct { double b,g,r,a; } c;
     urange range;
     unsigned int v[256];
 } hist_data_channel;
@@ -33,7 +33,6 @@ class hist_plot {
     urange gminmax;
     cairo_surface_t *surface;
     cairo_t *cr;
-    unsigned int hist_data_n;
 
     int draw_hdata(unsigned int *h,urange mm,double r,double g,double b,double a){
         int i;
@@ -65,6 +64,7 @@ protected:
     ScreenGeometry hist_screen;
     uint32_t * surface_buf;
     bool block_histplot;
+    unsigned int hist_data_n;
 
     void dump_png(const char *s){
         if(surface) cairo_surface_write_to_png (surface,s);
@@ -125,9 +125,9 @@ public:
         // DEBUG only !!!!!
         // cairo_surface_write_to_png (surface,"test_cairo_draw.png");
         // DEBUG
-        if (cr) cairo_destroy (cr);
-        if (surface) cairo_surface_destroy (surface);
-        delete hdata;
+        //if (cr) cairo_destroy (cr);
+        //if (surface) cairo_surface_destroy (surface);
+        //if (hdata) delete hdata;
     }
 
     void hist_init(ScreenGeometry sg){
