@@ -1,30 +1,34 @@
 <!DOCTYPE kpartgui>
-<effect tag="frei0r.color_compress0r" id="frei0r.color_compress0r">
-	<name>Color Compress0r</name>
-	<description>Color curves compression based on power function</description>
+<effect tag="frei0r.color_distanc0r" id="frei0r.color_distanc0r">
+	<name>Color Distanc0r</name>
+	<description>Color Distance in RGB or HSV color space with compression similar to color_compress0r</description>
 	<author>Toby Mangold</author>
+	<parameter type="color" name="color" default="0xFFFFFF">
+		<name>Reference Color</name>
+	</parameter>
 	<parameter type="constant" name="x-threshold" default="500" min="0" max="1000" factor="1000">
 		<name>Threshold (x)</name>
 	</parameter>
 	<parameter type="constant" name="y-threshold" default="500" min="0" max="1000" factor="1000">
 		<name>Threshold (y)</name>
 	</parameter>
-	<parameter type="constant" name="slope" default="450" min="0" max="900" factor="900">
+	<parameter type="constant" name="slope" default="500" min="0" max="1000" factor="900">
 		<name> Slope @ Threshold</name>
 	</parameter>
-	<parameter type="bool" name="hsv" default="0">
-		<name>HSV color model</name>
-	<parameter type="bool" name="channel_0" default="1">
-		<name>Map channel B/V</name>
+	<parameter type="bool" name="hue" default="0">
+		<name>Hue based distance</name>
 	</parameter>
-	<parameter type="bool" name="channel_1" default="1">
-		<name>Map channel G/S</name>
+	<parameter type="bool" name="valueweight" default="0">
+		<name>weight hue distance by value</name>
 	</parameter>
-	<parameter type="bool" name="channel_2" default="1">
-		<name>Map channel R/H</name>
+	<parameter type="bool" name="satweight" default="0">
+		<name>weight hue distance by sat.</name>
 	</parameter>
-	<parameter type="bool" name="channel_3" default="0">
-		<name>Map alpha</name>
+	<parameter type="bool" name="l2norm" default="0">
+		<name>Utilize a l2-norm instead of l1</name>
+	</parameter>
+	<parameter type="bool" name="alpha_mode" default="0">
+		<name>Map distance on alpha channel</name>
 	</parameter>
 	<parameter type="bool" name="histogram" default="0">
 		<name>Overlay histogram / mapping curve</name>

@@ -18,18 +18,25 @@
  * Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <frei0r.hpp>
+#include <cstdlib>
+#include <cassert>
+#include <cstring>
+#include <cmath>
+
+#include "frei0r_common.hpp"
 #include "hist_plot.hpp"
-//#include "common.h"
 
 // number of frames in ringbuffer (has to be 2^x ), defines max. kernel time duration
 #define PLANES_MAX 8
 #define KERNELS_REDUCED_PREC 2
 #define KERNELS_PER_FRAME (256>>KERNELS_REDUCED_PREC)
 // max. radius of kernel
-#define R_MAX 10
+#define R_MAX 5
 
 #define RB_INCR(x) ((++x) & (PLANES_MAX-1))
 #define RB_OFFSET(x,y) ((x+y) & (PLANES_MAX-1))
+
 
 class convkernel {
   int kernels_per_frame;
@@ -125,7 +132,7 @@ public:
 
 class selective_c0nv: public frei0r::filter , hist_plot {
   uint8_t map[256];
-  f0r_param_double map_xth;
+  f0r_param_double map_xth,map_yth;
   f0r_param_double map_slope;
   ScreenGeometry fscreen;
   int max_distance;
@@ -135,15 +142,13 @@ class selective_c0nv: public frei0r::filter , hist_plot {
   col128bit *planetable[PLANES_MAX];
   int plane;
 
-  col32bit rgba2hsva(const col32bit);
-  col32bit hsva2rgba(const col32bit);
-
   public:
   selective_c0nv(int wdt, int hgt);
   ~selective_c0nv();
 
   virtual void update();
   f0r_param_double param_xth;
+  f0r_param_double param_yth;
   f0r_param_double param_slope;
   f0r_param_double param_r;
   f0r_param_color param_color;
@@ -151,11 +156,12 @@ class selective_c0nv: public frei0r::filter , hist_plot {
   f0r_param_boolcxx param_inv;
 };
 
-selective_c0nv::selective_c0nv(int wdt, int hgt) {
+selective_c0nv::selective_c0nv(int wdt, int hgt) : hist_plot(4) {
     // set defaults
     int i;
 
     param_xth=0.5;
+    param_yth=0.5;
     param_slope=0.8;
     param_plot=false;
     param_inv=false;
@@ -164,8 +170,9 @@ selective_c0nv::selective_c0nv(int wdt, int hgt) {
     param_color.g=1.0;
     param_color.b=1.0;
 
-    register_param(param_xth, "threshold", "input value of mapping, where output level is 50% at the specified slope");
-    register_param(param_slope, "slope", "slope at threshold value, where output level is 50%");
+    register_param(param_xth, "threshold x", "input value of mapping, where slope is defined");
+    register_param(param_yth, "threshold y", "output value of mapping, where slope is defined");
+    register_param(param_slope, "slope", "slope at threshold point");
     register_param(param_color, "color", "ref color for distance");
     register_param(param_inv, "inverse", "inverse the regular distance->radius mapping");
     register_param(param_r, "radius", "Maximum radius of dynamic convolution kernel = spatial extension");
@@ -176,6 +183,7 @@ selective_c0nv::selective_c0nv(int wdt, int hgt) {
     register_param(rhy, "hposition_y", "relative position of histogram in y direction");
 
     map_xth=-1.0;
+    map_yth=-1.0;
     map_slope=-1.0;
 
     fscreen.w=wdt;
@@ -184,6 +192,7 @@ selective_c0nv::selective_c0nv(int wdt, int hgt) {
     fscreen.size = fscreen.w * fscreen.h;
     fscreen.stride = fscreen.w;
 
+    //planebuf=NULL;
     planebuf =  new col128bit[PLANES_MAX*fscreen.size];
     //memset(planetable[RB_OFFSET(plane,kernel.frames-1)],'\0',sizeof(col128bit)*fscreen.size);
     for(i=0;i<PLANES_MAX;i++)
@@ -195,7 +204,7 @@ selective_c0nv::selective_c0nv(int wdt, int hgt) {
  }
 
 selective_c0nv::~selective_c0nv() {
-  delete planebuf;
+  if (planebuf) delete planebuf;
 }
 
 void selective_c0nv::update() {
@@ -207,7 +216,7 @@ void selective_c0nv::update() {
   int d;
 
   union {
-      col32bit c;
+      col32bitBGRA c;
       uint32_t u;
   } cc;
   uint32_t t1,t2;
@@ -233,8 +242,9 @@ void selective_c0nv::update() {
   memset(planetable[RB_OFFSET(plane,kernel.frames-1)],'\0',sizeof(col128bit)*fscreen.size);
 
   // re-set mapping table
-  if ((map_xth != param_xth) || ( map_slope != param_slope)) {
+  if ((map_xth != param_xth) || (map_yth != param_yth) || ( map_slope != param_slope)) {
       map_xth = param_xth;
+      map_yth = param_yth;
       map_slope = param_slope;
       double a;
       if (param_slope < 0.01)
@@ -244,7 +254,7 @@ void selective_c0nv::update() {
       else
         a=tan(M_PI_2*param_slope);
       for (i=0; i<256;i++){
-        map[i]=int(0.5+255.0*POW_COMP(i/255.0,map_xth,a));
+        map[i]=int(0.5+255.0*POW_COMP(i/255.0,map_xth,map_yth,a));
       }
   }
 
@@ -342,4 +352,5 @@ void selective_c0nv::update() {
 frei0r::construct<selective_c0nv> plugin("selective_c0nv",
 				  "dynamic convolution based blur filter",
 				  "Mangold, Toby",
-				  1,0);
+				  1,0,F0R_COLOR_MODEL_RGBA8888
+				  );
