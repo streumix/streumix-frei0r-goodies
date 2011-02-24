@@ -139,17 +139,17 @@ void color_distanc0r::update() {
         | (param_vmult ? CDIST_VWEIGHT : 0) \
         | (param_smult ? CDIST_SWEIGHT : 0);
 
-  if (param_hist)  // there's a histogram to overlay -> zero data
-    memset( hdata[0].v, '\0',256*sizeof(unsigned int) );
-
   // calc cdists
   if (param_hist) {
+    // there's a histogram to overlay -> zero data
+    memset( hdata[0].v, '\0',256*sizeof(unsigned int) );
+
     for(n=0; n<fscreen.size; n++){
         tdist=rgba2cdist(colin[n],refcol, cmode);
         hdata[0].v[tdist]++;
         if (param_alpha){
             colout[n]=colin[n];
-            colout[n].a=map[tdist];
+            colout[n].a=255-map[tdist];
         } else {
             colout[n].b=colout[n].g=colout[n].r=map[tdist];
             colout[n].a=colin[n].a;
@@ -159,11 +159,12 @@ void color_distanc0r::update() {
     if(param_alpha){
         for(n=0; n<fscreen.size; n++){
             colout[n]=colin[n];
-            colout[n].a=map[rgba2cdist(colin[n],refcol,cmode)];
+            colout[n].a=255-map[rgba2cdist(colin[n],refcol,cmode)];
         }
     } else {
         for(n=0; n<fscreen.size; n++){
             colout[n].b=colout[n].g=colout[n].r=map[rgba2cdist(colin[n],refcol,cmode)];
+            //colout[n].b=colout[n].g=colout[n].r=rgba2cdist(colin[n],refcol,cmode);
             colout[n].a=colin[n].a;
         }
     }

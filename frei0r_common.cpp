@@ -33,18 +33,21 @@ uint8_t rgba2cdist(const col32bit c1,const col32bit c2, int mode){
         c2t=rgba2hsva64(c2);
         // h360 = 360*h/HSCALE
         // h1 > h2 -> /\ :: d=nvh1-h2 > 180 ?
-        dh=std::abs((int)c1t.h-c2t.h);
-        if (mode & CDIST_L2) dh=(dh*dh)/AHSCALE;
-        if( 2*dh > AHSCALE )
-            dh=AHSCALE-dh;
+        dh=std::abs((int)c1t.h-(int)c2t.h);
+
+        if( 2*dh >= AHSCALE )
+            dh=AHSCALE-dh-1;
         dh*=2;
 // TODO (tmangold#1#): There's some strange behaviour for l2 + hue mode. No idea yet ...        if (mode & CDIST_L2) dh=(dh*dh)/AHSCALE;
-        //are going to pay respect to saturation ?
+        // are we going to pay respect to saturation ?
         if(mode & CDIST_SWEIGHT)
-            dh=hsdist(dh,std::abs((int)c1t.s-c2t.s));
-        // are going to weight the value, too ?
+            dh=hsdist(dh,std::abs((int)c1t.s-(int)c2t.s));
+        //  are we going to weight the value, too ?
         if(mode & CDIST_VWEIGHT)
-            dh= (dh*inv_v_weight+std::abs((int)c1t.v - c2t.v))/k1;
+            dh= (dh*inv_v_weight+std::abs((int)c1t.v - (int)c2t.v))/k1;
+        // double-check
+        // (dh*iw + |v1-v2|)/(1+iw)
+        // (dh + w*|v1-v2|)/(w+1)
 
         return (uint8_t) (dh >> ABITS);
     } else { // RGB
