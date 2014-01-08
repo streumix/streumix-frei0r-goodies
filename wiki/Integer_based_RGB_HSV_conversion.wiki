@@ -103,10 +103,10 @@ inline col64bit rgba2hsva(const col32bit c){
 inline col32bit hsva2rgba(const col64bit c){
   col32bit r;
   uint32_t m;
-  int H,X,ir,ig,ib;
+  int32_t H,X,ir,ig,ib;
   const uint32_t k1=255 << ABITS;
-  const int k2=HSCALE << ABITS;
-  const int k3=1<<(ABITS-1);
+  const int32_t k2=HSCALE << ABITS;
+  const int32_t k3=1<<(ABITS-1);
   r.a=c.a;
 
   // set chroma and min component value m
@@ -118,9 +118,9 @@ inline col32bit hsva2rgba(const col64bit c){
   if (c.g == 0) {
       r.b = ( r.g = ( r.r = c.b >> ABITS ));
   } else {
-    ir=(int)c.r;
-    ig=(int)c.g;
-    ib=(int)c.b;
+    ir=(int32_t)c.r;
+    ig=(int32_t)c.g;
+    ib=(int32_t)c.b;
 
     H = (6*ir)/k2;
     X = ((ib*ig)/k2)*(k2-abs(6*ir- 2*(H>>1)*k2 - k2)) ;
