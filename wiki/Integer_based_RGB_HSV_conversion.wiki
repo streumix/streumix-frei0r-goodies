@@ -103,61 +103,61 @@ inline col64bit rgba2hsva(const col32bit c){
 inline col32bit hsva2rgba(const col64bit c){
   col32bit r;
   uint32_t m;
-  int32_t H,X,ir,ig,ib;
+  int32_t H,X,ih,is,iv;
   const uint32_t k1=255 << ABITS;
   const int32_t k2=HSCALE << ABITS;
   const int32_t k3=1<<(ABITS-1);
   r.a=c.a;
 
   // set chroma and min component value m
-  //chroma = ( c.b * c.g )/k1;
-  //m = c.b - chroma;
-  m = ((uint32_t)c.b*(k1 - (uint32_t )c.g ))/k1;
+  //chroma = ( c.v * c.s )/k1;
+  //m = c.v - chroma;
+  m = ((uint32_t)c.v*(k1 - (uint32_t )c.s ))/k1;
 
-  // chroma  == 0 <-> c.g == 0 --> m=c.b
-  if (c.g == 0) {
-      r.b = ( r.g = ( r.r = c.b >> ABITS ));
+  // chroma  == 0 <-> c.s == 0 --> m=c.v
+  if (c.s == 0) {
+      r.b = ( r.g = ( r.r = c.v >> ABITS ));
   } else {
-    ir=(int32_t)c.r;
-    ig=(int32_t)c.g;
-    ib=(int32_t)c.b;
+    ih=(int32_t)c.h;
+    is=(int32_t)c.s;
+    iv=(int32_t)c.v;
 
-    H = (6*ir)/k2;
-    X = ((ib*ig)/k2)*(k2-abs(6*ir- 2*(H>>1)*k2 - k2)) ;
+    H = (6*ih)/k2;
+    X = ((iv*is)/k2)*(k2-abs(6*ih- 2*(H>>1)*k2 - k2)) ;
 
     // removing additional bits --> unit8
-    X=( (X+ib*(k1 - ig ))/k1 + k3 ) >>ABITS;
+    X=((X+iv*(k1 - is))/k1 + k3) >>ABITS;
     m=m >> ABITS;
 
-    // ( chroma + m ) --> c.b ;
+    // ( chroma + m ) --> c.v ;
     switch (H) {
         case 0:
-          r.r = c.b >> ABITS ;
+          r.r = c.v >> ABITS ;
           r.g = X;
           r.b = m ;
           break;
         case 1:
           r.r = X;
-          r.g = c.b >> ABITS;
+          r.g = c.v >> ABITS;
           r.b = m ;
           break;
         case 2:
           r.r = m ;
-          r.g = c.b >> ABITS;
+          r.g = c.v >> ABITS;
           r.b = X;
           break;
         case 3:
           r.r = m ;
           r.g = X;
-          r.b = c.b >> ABITS;
+          r.b = c.v >> ABITS;
           break;
         case 4:
           r.r = X;
           r.g = m ;
-          r.b = c.b >> ABITS;
+          r.b = c.v >> ABITS;
           break;
         case 5:
-          r.r = c.b >> ABITS;
+          r.r = c.v >> ABITS;
           r.g = m ;
           r.b = X;
           break;
